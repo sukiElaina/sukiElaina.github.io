@@ -4,7 +4,7 @@ description: Examples of text, typography, math equations, diagrams, flowcharts,
 author: cotes
 date: 2019-08-08 11:33:00 +0800
 categories: [博客, 例子]
-tags: [操作]
+tags: [Example]
 pin: true
 math: true
 mermaid: true
