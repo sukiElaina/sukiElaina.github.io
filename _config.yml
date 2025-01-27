@@ -208,7 +208,6 @@ compress_html:
 exclude:
   - "*.gem"
   - "*.gemspec"
-  - common
   - docs
   - tools
   - README.md
