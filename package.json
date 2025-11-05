@@ -1,0 +1,29 @@
+{
+  "name": "catchnews",
+  "version": "1.0.0",
+  "description": "catch news from rss",
+  "main": "main/index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "node main/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sukiElaina/sukiElaina.github.io.git"
+  },
+  "keywords": [
+    "catch",
+    "news"
+  ],
+  "author": "sukiElaina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sukiElaina/sukiElaina.github.io/issues"
+  },
+  "homepage": "https://github.com/sukiElaina/sukiElaina.github.io#readme",
+  "dependencies": {
+    "rss-parser": "^3.13.0"
+  }
+}

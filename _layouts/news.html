@@ -15,6 +15,11 @@ layout: page
   {% endif %}
 
   {%- comment -%}
+    Ensure items are ordered by date descending so the latest date appears first
+  {%- endcomment -%}
+  {% assign items = items | sort: 'date' | reverse %}
+
+  {%- comment -%}
     Build unique dates list (YYYY-MM-DD) in descending order
   {%- endcomment -%}
   {% assign _date_str = '' %}
@@ -136,15 +141,10 @@ layout: page
           });
           list.appendChild(a);
         });
-        // auto-show preferred post: one whose title or categories contain 'Nature' (case-insensitive)
-        const preferred =
-          ps.find(
-            (p) =>
-              /nature/i.test(p.getAttribute('data-title') || '') || /nature/i.test(p.getAttribute('data-cats') || '')
-          ) || ps[0];
-        if (preferred) {
-          showPost(preferred.id);
-          setActiveTitle(preferred.id);
+        // auto-show the first post of the selected date (no category/title preference)
+        if (ps[0]) {
+          showPost(ps[0].id);
+          setActiveTitle(ps[0].id);
         }
       }
 
