@@ -1,0 +1,234 @@
+---
+layout: page
+# The News of posts.
+---
+{% include lang.html %}
+
+{% assign df_strftime_m = site.data.locales[lang].df.archives.strftime | default: '/ %m' %}
+{% assign df_dayjs_m = site.data.locales[lang].df.archives.dayjs | default: '/ MM' %}
+
+<div id="archives" class="pl-xl-3">
+  {% if site.news and site.news != empty %}
+    {% assign items = site.news %}
+  {% else %}
+    {% assign items = site.posts %}
+  {% endif %}
+
+  {%- comment -%}
+    Build unique dates list (YYYY-MM-DD) in descending order
+  {%- endcomment -%}
+  {% assign _date_str = '' %}
+  {% for post in items %}
+    {% assign d = post.date | date: '%Y-%m-%d' %}
+    {% unless _date_str contains d %}
+      {% capture _date_str %}{{ _date_str }}|{{ d }}{% endcapture %}
+    {% endunless %}
+  {% endfor %}
+  {% assign dates = _date_str | split: '|' %}
+  {% if dates[0] == '' %}
+    {% assign dates = dates | slice: 1, dates.size %}
+  {% endif %}
+
+  <div class="news-toolbar mb-4 d-flex justify-content-between align-items-center">
+    <div id="news-titles" class="d-flex flex-wrap gap-3"></div>
+
+    <div id="news-controls" class="d-flex align-items-center">
+      <div class="btn-group btn-group-sm" role="group" aria-label="Granularity">
+        <button type="button" class="btn btn-outline-secondary" data-granularity="year">年</button>
+        <button type="button" class="btn btn-outline-secondary" data-granularity="month">月</button>
+        <button type="button" class="btn btn-outline-secondary active" data-granularity="day">日</button>
+      </div>
+      <!--
+        jump icon button before the date select (removed). If you remove this button,
+        the script below will fall back to a keyboard shortcut: press "o" to open the
+        currently visible post.
+      -->
+      <select id="news-date-select" class="form-select form-select-sm ms-2"></select>
+    </div>
+  </div>
+
+  <div id="news-contents">
+    {% for post in items %}
+      {% assign d = post.date | date: '%Y-%m-%d' %}
+      <div
+        class="news-post"
+        data-date="{{ d }}"
+        data-cats="{{ post.categories | join: ',' }}"
+        data-url="{{ post.url | relative_url }}"
+        data-title="{{ post.title | escape }}"
+        id="news-post-{{ forloop.index0 }}"
+        style="display:none;"
+      >
+        <div class="news-body">
+          {% if post.output %}
+            {{ post.output }}
+          {% else %}
+            {%- assign raw = post.content -%}
+            {%- if raw contains '---' -%}
+              {%- assign parts = raw | split: '---' | reverse -%}
+              {%- assign body = parts[0] -%}
+            {%- else -%}
+              {%- assign body = raw -%}
+            {%- endif -%}
+            {{ body | markdownify }}
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    // Prepare data arrays from DOM
+    (function () {
+      const posts = Array.from(document.querySelectorAll('.news-post'));
+      if (!posts.length) return;
+
+      // Collect unique dates in the order rendered (items sorted desc)
+      const dates = [];
+      posts.forEach((p) => {
+        const d = p.getAttribute('data-date');
+        if (!dates.includes(d)) dates.push(d);
+      });
+
+      // Utility to get posts for a date
+      function postsFor(date) {
+        return posts.filter((p) => p.getAttribute('data-date') === date);
+      }
+
+      // Populate date select for a given granularity
+      function buildDateOptions(granularity, selectedDate) {
+        const sel = document.getElementById('news-date-select');
+        sel.innerHTML = '';
+        const seen = new Set();
+        dates.forEach((d) => {
+          let key = d;
+          if (granularity === 'year') key = d.slice(0, 4);
+          else if (granularity === 'month') key = d.slice(0, 7);
+          if (!seen.has(key)) {
+            seen.add(key);
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = key;
+            sel.appendChild(opt);
+          }
+        });
+        if (selectedDate) sel.value = selectedDate.slice(0, sel.value.length);
+        return sel;
+      }
+
+      // Show titles for a date and wire click handlers
+      function showTitles(date) {
+        const list = document.getElementById('news-titles');
+        list.innerHTML = '';
+        const ps = postsFor(date);
+        ps.forEach((p) => {
+          const id = p.id;
+          // create title button instead of hyperlink
+          const a = document.createElement('button');
+          a.type = 'button';
+          a.className = 'btn btn-sm btn-outline-primary me-3 title-btn';
+          a.textContent = p.getAttribute('data-title');
+          a.dataset.target = id;
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPost(id);
+            setActiveTitle(id);
+          });
+          list.appendChild(a);
+        });
+        // auto-show preferred post: one whose title or categories contain 'Nature' (case-insensitive)
+        const preferred =
+          ps.find(
+            (p) =>
+              /nature/i.test(p.getAttribute('data-title') || '') || /nature/i.test(p.getAttribute('data-cats') || '')
+          ) || ps[0];
+        if (preferred) {
+          showPost(preferred.id);
+          setActiveTitle(preferred.id);
+        }
+      }
+
+      function showPost(id) {
+        posts.forEach((p) => (p.style.display = p.id === id ? '' : 'none'));
+        // scroll into view a bit
+        const el = document.getElementById(id);
+        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+      }
+
+      // highlight the active title button
+      function setActiveTitle(id) {
+        const buttons = Array.from(document.querySelectorAll('.title-btn'));
+        buttons.forEach((b) => {
+          if (b.dataset.target === id) {
+            b.classList.remove('btn-outline-primary');
+            b.classList.add('btn-primary');
+          } else {
+            b.classList.remove('btn-primary');
+            b.classList.add('btn-outline-primary');
+          }
+        });
+      }
+
+      // Granularity buttons
+      const gButtons = Array.from(document.querySelectorAll('[data-granularity]'));
+      let currentGran = 'day';
+      gButtons.forEach((btn) =>
+        btn.addEventListener('click', () => {
+          gButtons.forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentGran = btn.getAttribute('data-granularity');
+          buildDateOptions(currentGran);
+        })
+      );
+
+      // On date select change, determine a concrete date to show
+      document.getElementById('news-date-select').addEventListener('change', function () {
+        const v = this.value;
+        if (currentGran === 'year') {
+          // pick latest date with that year
+          const target = dates.find((d) => d.startsWith(v));
+          if (target) showTitles(target);
+        } else if (currentGran === 'month') {
+          const target = dates.find((d) => d.startsWith(v));
+          if (target) showTitles(target);
+        } else {
+          showTitles(v);
+        }
+      });
+
+      // wire jump button to open the current visible post (if present). If the
+      // button was removed from the template, provide an unobtrusive keyboard
+      // alternative: press the "o" key to open the visible post.
+      const jumpBtn = document.getElementById('news-jump');
+      if (jumpBtn) {
+        jumpBtn.addEventListener('click', () => {
+          const visible = posts.find((p) => p.style.display !== 'none');
+          if (visible) {
+            const url = visible.getAttribute('data-url');
+            if (url) window.location.href = url;
+          }
+        });
+      } else {
+        // Fallback keyboard shortcut: press "o" to open current visible post.
+        document.addEventListener('keydown', (e) => {
+          // Ignore if typing in an input/textarea or using modifier keys.
+          const tag = document.activeElement && document.activeElement.tagName;
+          if (tag === 'INPUT' || tag === 'TEXTAREA' || e.ctrlKey || e.metaKey || e.altKey) return;
+          if (e.key === 'o') {
+            const visible = posts.find((p) => p.style.display !== 'none');
+            if (visible) {
+              const url = visible.getAttribute('data-url');
+              if (url) window.location.href = url;
+            }
+          }
+        });
+      }
+
+      // initialize: default to latest date
+      const latest = dates[0];
+      buildDateOptions('day');
+      document.getElementById('news-date-select').value = latest;
+      showTitles(latest);
+    })();
+  </script>
+</div>

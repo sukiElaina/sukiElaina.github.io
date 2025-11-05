@@ -6,6 +6,7 @@ layout:
   post: 文章
   category: 分类
   tag: 标签
+  news: 新闻
 
 # The tabs of sidebar
 tabs:
@@ -14,6 +15,7 @@ tabs:
   categories: 分类
   tags: 标签
   archives: 归档
+  news: 新闻
   about: 关于
 
 # the text displayed in the search bar & search results

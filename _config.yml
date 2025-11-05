@@ -171,6 +171,10 @@ collections:
     output: true
     sort_by: order
 
+  news:
+    output: true
+    sort_by: date
+
 defaults:
   - scope:
       path: "" # An empty string here means all files in the project
