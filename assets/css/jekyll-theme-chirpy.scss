@@ -2,9 +2,51 @@
 ---
 
 @use 'main
-{%- if jekyll.environment == 'production' -%}
+{%- if jekyll.environment == ' production ' -%}
   .bundle
 {%- endif -%}
 ';
 
 /* append your custom style below */
+
+/* News toolbar visual overrides to ensure consistent button/select sizing
+   across environments (local dev / GitHub Pages) */
+#news {
+  .news-toolbar {
+    .btn {
+      font-size: 0.95rem;
+      padding: 0.28rem 0.6rem;
+      line-height: 1.2;
+    }
+
+    .btn.btn-sm {
+      font-size: 0.9rem;
+      padding: 0.22rem 0.5rem;
+    }
+
+    /* Ensure active/selected visual is filled instead of outline when
+       `.active` is present (some builds/themes may not style `.active`) */
+    .btn.active,
+    .btn.btn-secondary,
+    .btn.btn-outline-secondary.active {
+      color: #fff !important;
+      background-color: var(--bs-primary, #0d6efd) !important;
+      border-color: var(--bs-primary, #0d6efd) !important;
+      box-shadow: none !important;
+    }
+
+    /* Titles area buttons */
+    #news-titles .title-btn {
+      font-size: 0.95rem;
+      padding: 0.28rem 0.6rem;
+    }
+
+    /* Date select sizing to match small buttons */
+    select.form-select,
+    select.form-select-sm {
+      font-size: 0.95rem;
+      padding: 0.2rem 0.5rem;
+      height: calc(1.5em + 0.6rem + 2px);
+    }
+  }
+}
