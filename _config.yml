@@ -135,7 +135,7 @@ assets:
     enabled: true # boolean, keep empty means false
     # specify the Jekyll environment, empty means both
     # only works if `assets.self_host.enabled` is 'true'
-    env: development # [development | production]
+    env: production # [development | production]
 
 pwa:
   enabled: true # The option for PWA feature (installable)
@@ -198,7 +198,7 @@ defaults:
       permalink: /:title/
   - scope:
       path: ""
-      type: news  # see `site.collections`
+      type: news # see `site.collections`
     values:
       layout: page
 sass:
