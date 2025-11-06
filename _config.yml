@@ -29,7 +29,7 @@ github:
   username: sukiElaina # change to your GitHub username
 
 twitter:
-  username: sukiElaina # change to your Twitter username
+  username: AZyuanjun # change to your Twitter username
 
 social:
   # Change to your full name.
@@ -172,7 +172,7 @@ collections:
     sort_by: order
 
   news:
-    output: false
+    output: true
     sort_by: date
 
 defaults:
@@ -200,7 +200,7 @@ defaults:
       path: ""
       type: news # see `site.collections`
     values:
-      layout: page
+      permalink: /news/:path/
 sass:
   style: compressed
 

@@ -1,5 +1,5 @@
 ---
 layout: news
-icon: fas fa-stream
+icon: fas fa-newspaper
 order: 4
 ---

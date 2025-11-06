@@ -66,18 +66,7 @@ layout: page
         id="news-post-{{ forloop.index0 }}"
       >
         <div class="news-body">
-          {% if post.output %}
-            {{ post.output }}
-          {% else %}
-            {%- assign raw = post.content -%}
-            {%- if raw contains '---' -%}
-              {%- assign parts = raw | split: '---' | reverse -%}
-              {%- assign body = parts[0] -%}
-            {%- else -%}
-              {%- assign body = raw -%}
-            {%- endif -%}
-            {{ body | markdownify }}
-          {% endif %}
+          {{ post.content | markdownify }}
         </div>
       </div>
     {% endfor %}

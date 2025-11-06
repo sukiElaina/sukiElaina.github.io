@@ -40,7 +40,7 @@ async function fetchRSS(url) {
 async function saveRSSData(category, feed, url) {
   const filename = `${category}.json`;
   const filepath = path.join(RSS_DIR, filename);
-  
+
   const data = {
     category,
     url,
@@ -62,10 +62,10 @@ async function saveRSSData(category, feed, url) {
       }))
     }
   };
-  
+
   await fs.writeFile(filepath, JSON.stringify(data, null, 2), 'utf-8');
   console.log(`  ✓ 已保存: ${filename} (${feed.items.length} 篇文章)`);
-  
+
   return data;
 }
 
@@ -91,7 +91,7 @@ function generateNewsFilename(date, category) {
 async function readExistingNewsFile(filepath) {
   try {
     const content = await fs.readFile(filepath, 'utf-8');
-    
+
     // 提取现有的文章链接
     const linkRegex = /\[.*?\]\((https?:\/\/[^\)]+)\)/g;
     const existingLinks = [];
@@ -99,7 +99,7 @@ async function readExistingNewsFile(filepath) {
     while ((match = linkRegex.exec(content)) !== null) {
       existingLinks.push(match[1]);
     }
-    
+
     return { content, existingLinks };
   } catch {
     return { content: null, existingLinks: [] };
@@ -126,10 +126,10 @@ function generateFileHeader(date, category) {
   const now = new Date();
   const time = now.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
   const categoryLower = category.toLowerCase();
-  
+
   return `---
 layout: post
-title: ${category} Articles - ${date}
+title:
 date: ${date} ${time}
 category: news
 author: sukiElaina
@@ -146,44 +146,44 @@ summary: AI summary of ${category} articles
 async function processDayCategoryArticles(date, category, articles) {
   const filename = generateNewsFilename(date, category);
   const filepath = path.join(NEWS_DIR, filename);
-  
+
   console.log(`\n  处理日期: ${date} (${articles.length} 篇文章)`);
-  
+
   // 读取现有文件
   const { content: existingContent, existingLinks } = await readExistingNewsFile(filepath);
-  
+
   // 过滤出新文章
   const newArticles = articles.filter(article => !existingLinks.includes(article.link));
-  
+
   if (newArticles.length === 0) {
     console.log(`    ⊘ 所有文章都已存在`);
     return;
   }
-  
+
   console.log(`    发现 ${newArticles.length} 篇新文章`);
-  
+
   // 生成新文章的内容
   let newContent = '';
-  
+
   for (const article of newArticles) {
     console.log(`    ✎ 处理: ${article.title}`);
     console.log(`      调用 AI 生成总结...`);
-    
+
     try {
       const summary = await summarizeArticle(article.title, article.link);
       newContent += generateArticleSection(article, summary);
       console.log(`      ✓ 已生成总结`);
-      
+
       // 添加延迟，避免 API 请求过快
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
     } catch (error) {
       console.error(`      ✗ 处理失败: ${error.message}`);
       // 即使失败也添加一个占位符
       newContent += generateArticleSection(article, `AI 总结生成失败: ${error.message}`);
     }
   }
-  
+
   // 合并或创建文件
   let finalContent;
   if (existingContent) {
@@ -195,7 +195,7 @@ async function processDayCategoryArticles(date, category, articles) {
     finalContent = generateFileHeader(date, category) + newContent;
     console.log(`    ✓ 创建新文件: ${filename}`);
   }
-  
+
   await fs.writeFile(filepath, finalContent, 'utf-8');
 }
 
@@ -204,11 +204,11 @@ async function processDayCategoryArticles(date, category, articles) {
  */
 function organizeArticlesByDateAndCategory(rssData) {
   const organized = {};
-  
+
   for (const article of rssData.feed.items) {
     const date = extractDate(article.isoDate);
     if (!date) continue;
-    
+
     const key = `${date}|${rssData.category}`;
     if (!organized[key]) {
       organized[key] = {
@@ -219,7 +219,7 @@ function organizeArticlesByDateAndCategory(rssData) {
     }
     organized[key].articles.push(article);
   }
-  
+
   return organized;
 }
 
@@ -229,10 +229,10 @@ function organizeArticlesByDateAndCategory(rssData) {
 async function processCategory(category, rssData) {
   console.log(`\n处理分类: ${category}`);
   console.log(`  共 ${rssData.feed.items.length} 篇文章`);
-  
+
   // 按日期组织文章
   const organized = organizeArticlesByDateAndCategory(rssData);
-  
+
   // 处理每个日期的文章
   for (const group of Object.values(organized)) {
     await processDayCategoryArticles(group.date, group.category, group.articles);
@@ -247,55 +247,55 @@ async function main() {
     console.log('='.repeat(60));
     console.log('RSS 自动化处理系统启动');
     console.log('='.repeat(60));
-    
+
     // 确保目录存在
     await ensureDir(RSS_DIR);
     await ensureDir(NEWS_DIR);
-    
+
     // 读取 RSS 配置
     console.log('\n1. 读取 RSS 配置...');
     const rssConfig = JSON.parse(await fs.readFile(RSS_CONFIG_PATH, 'utf-8'));
     console.log(`   找到 ${Object.keys(rssConfig).length} 个分类`);
-    
+
     // 抓取所有 RSS 源
     console.log('\n2. 抓取 RSS 源...');
     const allRSSData = {};
-    
+
     for (const [category, urls] of Object.entries(rssConfig)) {
       console.log(`\n分类: ${category}`);
-      
+
       for (const url of urls) {
         try {
           const feed = await fetchRSS(url);
           const rssData = await saveRSSData(category, feed, url);
-          
+
           // 存储数据供后续处理
           if (!allRSSData[category]) {
             allRSSData[category] = [];
           }
           allRSSData[category].push(rssData);
-          
+
         } catch (error) {
           console.error(`  ✗ 抓取失败: ${error.message}`);
         }
       }
     }
-    
+
     // 处理文章并生成 AI 总结
     console.log('\n3. 处理文章并生成 AI 总结...');
-    
+
     for (const [category, rssDataList] of Object.entries(allRSSData)) {
       for (const rssData of rssDataList) {
         await processCategory(category, rssData);
       }
     }
-    
+
     console.log('\n' + '='.repeat(60));
     console.log('✓ 所有任务完成！');
     console.log('='.repeat(60));
-    
+
     process.exit(0);
-    
+
   } catch (error) {
     console.error('\n错误:', error.message);
     console.error(error.stack);
