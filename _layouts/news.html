@@ -34,23 +34,18 @@ layout: page
     {% assign dates = dates | slice: 1, dates.size %}
   {% endif %}
 
-  <div class="news-toolbar mb-4 d-flex justify-content-between align-items-center">
-    <div class="d-flex align-items-center flex-wrap gap-3">
+  <div class="news-toolbar mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center flex-wrap gap-2">
       <div id="news-cats" class="d-flex flex-wrap gap-2"></div>
     </div>
 
-    <div id="news-controls" class="d-flex align-items-center">
-      <div class="btn-group btn-group-sm" role="group" aria-label="Granularity">
+    <div id="news-controls" class="d-flex align-items-center gap-2">
+      <div class="btn-group" role="group" aria-label="Granularity">
         <button type="button" class="btn btn-outline-secondary" data-granularity="year">年</button>
         <button type="button" class="btn btn-outline-secondary" data-granularity="month">月</button>
         <button type="button" class="btn btn-outline-secondary active" data-granularity="day">日</button>
       </div>
-      <!--
-        jump icon button before the date select (removed). If you remove this button,
-        the script below will fall back to a keyboard shortcut: press "o" to open the
-        currently visible post.
-      -->
-      <select id="news-date-select" class="form-select form-select-sm ms-2"></select>
+      <select id="news-date-select" class="form-select"></select>
     </div>
   </div>
 

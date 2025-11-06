@@ -125,13 +125,11 @@ ${summary}
 function generateFileHeader(date, category) {
   const now = new Date();
   const time = now.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
-  const categoryLower = category.toLowerCase();
 
   return `---
 title:
 date: ${date} ${time}
 author: sukiElaina
-
 ---
 
 `;
