@@ -30,6 +30,8 @@
     .btn.btn-secondary,
     .btn.btn-outline-secondary.active {
       color: #fff !important;
+      background-color: var(--bs-primary, #6c757d) !important;
+      border-color: var(--bs-primary, #6c757d) !important;
       box-shadow: none !important;
     }
 
