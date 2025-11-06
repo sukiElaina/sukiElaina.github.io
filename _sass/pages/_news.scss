@@ -1,0 +1,32 @@
+@use '../abstracts/placeholders';
+
+/* Styles specific to the News page */
+#news {
+  /* ensure no page-specific left padding */
+  padding-left: 0;
+
+  /* fine-tune the headings rendered from markdown links */
+  .news-body {
+    h1 {
+      font-size: 1.15rem; /* smaller than default so links look lighter */
+      margin: 0.6rem 0; /* tighter vertical rhythm */
+      line-height: 1.6;
+      color: var(--heading-color);
+      font-weight: 500;
+
+      a {
+        /* clean base look */
+        text-decoration: none;
+        color: var(--link-color);
+        border-bottom: 1px solid transparent; /* appear on hover */
+        transition: color 0.2s ease, border-color 0.2s ease;
+
+        &:hover,
+        &:focus-visible {
+          /* accent color + underline on hover */
+          @extend %link-hover;
+        }
+      }
+    }
+  }
+}
