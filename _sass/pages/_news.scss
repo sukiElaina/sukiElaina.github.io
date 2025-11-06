@@ -5,6 +5,16 @@
   /* ensure no page-specific left padding */
   padding-left: 0;
 
+  /* When JS is active, only show the chosen post */
+  &.js-enabled {
+    .news-post {
+      display: none;
+    }
+    .news-post.active {
+      display: block;
+    }
+  }
+
   /* fine-tune the headings rendered from markdown links */
   .news-body {
     h1 {

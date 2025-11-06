@@ -35,7 +35,10 @@ layout: page
   {% endif %}
 
   <div class="news-toolbar mb-4 d-flex justify-content-between align-items-center">
-    <div id="news-titles" class="d-flex flex-wrap gap-3"></div>
+    <div class="d-flex align-items-center flex-wrap gap-3">
+      <div id="news-cats" class="d-flex flex-wrap gap-2 me-2"></div>
+      <div id="news-titles" class="d-flex flex-wrap gap-3"></div>
+    </div>
 
     <div id="news-controls" class="d-flex align-items-center">
       <div class="btn-group btn-group-sm" role="group" aria-label="Granularity">
@@ -84,6 +87,8 @@ layout: page
   <script>
     // Prepare data arrays from DOM
     (function () {
+      const root = document.getElementById('news');
+      if (root) root.classList.add('js-enabled');
       const posts = Array.from(document.querySelectorAll('.news-post'));
       if (!posts.length) return;
 
@@ -120,18 +125,62 @@ layout: page
         return sel;
       }
 
-      // Show titles for a date and wire click handlers
-      function showTitles(date) {
+      // Build category buttons for a set of posts
+      function buildCats(ps) {
+        const wrap = document.getElementById('news-cats');
+        wrap.innerHTML = '';
+
+        // collect unique categories from data-cats
+        const all = new Set();
+        ps.forEach((p) => {
+          const raw = p.getAttribute('data-cats') || '';
+          const parts = raw
+            .split(',')
+            .map((s) => s.trim())
+            .filter((s) => s);
+          if (!parts.length) all.add('未分类');
+          parts.forEach((c) => all.add(c));
+        });
+
+        if (!all.size) return null;
+        // if only 'uncategorized', hide category bar (nothing to filter)
+        if (all.size === 1 && all.has('未分类')) {
+          wrap.innerHTML = '';
+          return null;
+        }
+
+        // helper to create a button
+        function makeBtn(text, value, active) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'btn btn-sm ' + (active ? 'btn-secondary' : 'btn-outline-secondary');
+          b.textContent = text;
+          b.dataset.value = value;
+          return b;
+        }
+
+        // label mapping
+        const label = (key) => (key === 'uncategorized' ? '未分类' : key);
+
+        // Add 'All' button first
+        wrap.appendChild(makeBtn('全部', 'all', true));
+        all.forEach((c) => wrap.appendChild(makeBtn(label(c), c, false)));
+
+        return wrap;
+      }
+
+      // Render title buttons for posts and wire click handlers
+      function renderTitles(ps) {
         const list = document.getElementById('news-titles');
         list.innerHTML = '';
-        const ps = postsFor(date);
         ps.forEach((p) => {
           const id = p.id;
-          // create title button instead of hyperlink
+          const title =
+            p.getAttribute('data-title') || p.querySelector('h1, h2, h3, h4, h5, h6')?.textContent || 'Untitled';
           const a = document.createElement('button');
           a.type = 'button';
           a.className = 'btn btn-sm btn-outline-primary me-3 title-btn';
-          a.textContent = p.getAttribute('data-title');
+          a.textContent = title;
           a.dataset.target = id;
           a.addEventListener('click', (e) => {
             e.preventDefault();
@@ -140,15 +189,52 @@ layout: page
           });
           list.appendChild(a);
         });
-        // auto-show the first post of the selected date (no category/title preference)
         if (ps[0]) {
           showPost(ps[0].id);
           setActiveTitle(ps[0].id);
         }
       }
 
+      // Show titles for a date and wire category filters
+      function showTitles(date) {
+        const ps = postsFor(date);
+        // Build categories for this date
+        const catsWrap = buildCats(ps);
+        let currentCat = 'all';
+        function filterByCat() {
+          if (currentCat === 'all') return ps;
+          return ps.filter((p) => {
+            const raw = p.getAttribute('data-cats') || '';
+            const parts = raw
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s);
+            return parts.length ? parts.includes(currentCat) : currentCat === 'uncategorized';
+          });
+        }
+
+        // bind category buttons
+        if (catsWrap) {
+          catsWrap.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            currentCat = btn.dataset.value;
+            // update active visual state
+            Array.from(catsWrap.querySelectorAll('button')).forEach((b) => {
+              b.classList.remove('btn-secondary');
+              b.classList.add('btn-outline-secondary');
+            });
+            btn.classList.add('btn-secondary');
+            btn.classList.remove('btn-outline-secondary');
+            renderTitles(filterByCat());
+          });
+        }
+
+        renderTitles(filterByCat());
+      }
+
       function showPost(id) {
-        posts.forEach((p) => (p.style.display = p.id === id ? '' : 'none'));
+        posts.forEach((p) => p.classList.toggle('active', p.id === id));
         // scroll into view a bit
         const el = document.getElementById(id);
         if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
