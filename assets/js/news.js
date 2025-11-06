@@ -61,57 +61,9 @@
     return sel;
   }
 
-  function buildCats(ps) {
-    var wrap = document.getElementById('news-cats');
-    if (!wrap) return null;
-    wrap.innerHTML = '';
-
-    var all = {};
-    for (var i = 0; i < ps.length; i++) {
-      var raw = ps[i].getAttribute('data-cats') || '';
-      var parts = raw.split(',');
-      var any = false;
-      for (var j = 0; j < parts.length; j++) {
-        var s = (parts[j] || '').trim();
-        if (s) {
-          all[s] = true;
-          any = true;
-        }
-      }
-      if (!any) all['uncategorized'] = true;
-    }
-
-    var keys = Object.keys(all);
-    if (!keys.length) return null;
-    if (keys.length === 1 && keys[0] === 'uncategorized') {
-      wrap.innerHTML = '';
-      return null;
-    }
-
-    function makeBtn(text, value, active) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className =
-        'btn btn-sm ' + (active ? 'btn-secondary' : 'btn-outline-secondary');
-      b.textContent = text;
-      b.setAttribute('data-value', value);
-      return b;
-    }
-
-    function label(key) {
-      return key === 'uncategorized' ? '未分类' : key;
-    }
-
-    wrap.appendChild(makeBtn('全部', 'all', true));
-    keys.forEach(function (c) {
-      wrap.appendChild(makeBtn(label(c), c, false));
-    });
-
-    return wrap;
-  }
-
   function renderTitles(ps) {
-    var list = document.getElementById('news-titles');
+    // 直接在 news-cats 区域显示所有标题按钮
+    var list = document.getElementById('news-cats');
     if (!list) return;
     list.innerHTML = '';
     for (var i = 0; i < ps.length; i++) {
@@ -123,7 +75,7 @@
         (heading ? heading.textContent : 'Untitled');
       var a = document.createElement('button');
       a.type = 'button';
-      a.className = 'btn btn-sm btn-outline-primary me-3 title-btn';
+      a.className = 'btn btn-sm btn-outline-secondary me-2 title-btn';
       a.textContent = title;
       a.setAttribute('data-target', id);
       a.addEventListener('click', function (e) {
@@ -142,46 +94,8 @@
 
   function showTitles(date) {
     var ps = postsFor(date);
-    var catsWrap = buildCats(ps);
-    var currentCat = 'all';
-
-    function filterByCat() {
-      if (currentCat === 'all') return ps;
-      var filtered = [];
-      for (var i = 0; i < ps.length; i++) {
-        var raw = ps[i].getAttribute('data-cats') || '';
-        var parts = raw.split(',');
-        var matched = false;
-        for (var j = 0; j < parts.length; j++) {
-          var s = (parts[j] || '').trim();
-          if (s === currentCat) {
-            matched = true;
-            break;
-          }
-        }
-        if (!parts.length && currentCat === 'uncategorized') matched = true;
-        if (matched) filtered.push(ps[i]);
-      }
-      return filtered;
-    }
-
-    if (catsWrap) {
-      catsWrap.addEventListener('click', function (e) {
-        var btn =
-          e.target && e.target.closest ? e.target.closest('button') : e.target;
-        if (!btn || btn.tagName !== 'BUTTON') return;
-        currentCat = btn.getAttribute('data-value');
-        toArray(catsWrap.querySelectorAll('button')).forEach(function (b) {
-          b.classList.remove('btn-secondary');
-          b.classList.add('btn-outline-secondary');
-        });
-        btn.classList.add('btn-secondary');
-        btn.classList.remove('btn-outline-secondary');
-        renderTitles(filterByCat());
-      });
-    }
-
-    renderTitles(filterByCat());
+    // 不再使用分类筛选，直接显示所有标题
+    renderTitles(ps);
   }
 
   function showPost(id) {
@@ -207,11 +121,11 @@
   function setActiveTitle(id) {
     toArray(document.querySelectorAll('.title-btn')).forEach(function (b) {
       if (b.getAttribute('data-target') === id) {
-        b.classList.remove('btn-outline-primary');
-        b.classList.add('btn-primary');
+        b.classList.remove('btn-outline-secondary');
+        b.classList.add('btn-secondary');
       } else {
-        b.classList.remove('btn-primary');
-        b.classList.add('btn-outline-primary');
+        b.classList.remove('btn-secondary');
+        b.classList.add('btn-outline-secondary');
       }
     });
   }
