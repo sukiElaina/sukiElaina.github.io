@@ -17,6 +17,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "node main/index.js",
     "test": "node main/index.js"
   },
   "dependencies": {

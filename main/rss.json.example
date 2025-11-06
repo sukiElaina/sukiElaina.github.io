@@ -1,0 +1,16 @@
+{
+  "Science": [
+    "https://feeds.science.org/rss"
+  ],
+  "Nature": [
+    "http://feeds.nature.com/nature/rss/current"
+  ],
+  "前沿交叉": [
+    "http://www.sciencenet.cn/xml/field.aspx?di=4"
+  ],
+  "示例-添加更多源": [
+    "示例说明：在这里添加你想要抓取的 RSS 源",
+    "格式：每个分类可以包含多个 RSS URL",
+    "删除这个示例分类后即可使用"
+  ]
+}

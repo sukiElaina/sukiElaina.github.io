@@ -28,5 +28,14 @@ assets/js/dist
 
 # Other
 origin/*
-rss/*
-main/*
+rss/*.json
+!rss/.gitkeep
+
+# API Keys and secrets
+.env
+.env.local
+*.key
+*.pem
+
+# Main directory - keep code, ignore data
+main/node_modules/
