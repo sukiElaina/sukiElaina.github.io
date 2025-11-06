@@ -13,9 +13,14 @@
 ## 🔒 GitHub Secrets 设置
 
 1. 进入仓库 Settings → Secrets and variables → Actions
-2. 添加 Secret：
+2. 确保你在 **Secrets** 标签页（不是 Variables）
+3. 点击 **New repository secret** 按钮
+4. 添加 Secret：
    - Name: `SILICONFLOW_API_KEY`
    - Value: 你的硅基流动 API 密钥
+5. 点击 **Add secret** 保存
+
+**注意**：使用 **Repository secrets**（不是 Environment secrets）
 
 ## 🔧 GitHub Actions 权限
 
