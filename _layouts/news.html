@@ -138,13 +138,13 @@ layout: page
             .split(',')
             .map((s) => s.trim())
             .filter((s) => s);
-          if (!parts.length) all.add('未分类');
+          if (!parts.length) all.add('uncategorized');
           parts.forEach((c) => all.add(c));
         });
 
         if (!all.size) return null;
         // if only 'uncategorized', hide category bar (nothing to filter)
-        if (all.size === 1 && all.has('未分类')) {
+        if (all.size === 1 && all.has('uncategorized')) {
           wrap.innerHTML = '';
           return null;
         }
