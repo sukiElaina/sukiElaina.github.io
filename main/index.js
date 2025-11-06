@@ -128,13 +128,10 @@ function generateFileHeader(date, category) {
   const categoryLower = category.toLowerCase();
 
   return `---
-layout: post
 title:
 date: ${date} ${time}
-category: news
 author: sukiElaina
-tags: [${categoryLower}]
-summary: AI summary of ${category} articles
+
 ---
 
 `;
