@@ -196,7 +196,11 @@ defaults:
     values:
       layout: page
       permalink: /:title/
-
+  - scope:
+      path: ""
+      type: news  # see `site.collections`
+    values:
+      layout: page
 sass:
   style: compressed
 
