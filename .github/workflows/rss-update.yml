@@ -3,7 +3,7 @@ name: RSS Auto Update
 on:
   # 每天北京时间 8:00 运行（UTC 时间 0:00）
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
   # 允许手动触发
   workflow_dispatch:
@@ -27,8 +27,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
 
       # 3. 安装依赖
       - name: Install dependencies
