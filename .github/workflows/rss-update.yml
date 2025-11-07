@@ -55,3 +55,16 @@ jobs:
           git add _news/ rss/
           git commit -m "chore: auto update RSS feeds [skip ci]"
           git push
+
+      # 7. 触发 pages-deploy workflow
+      - name: Trigger pages-deploy workflow
+        if: steps.git-check.outputs.has_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'pages-deploy.yml',
+              ref: 'main'
+            })
