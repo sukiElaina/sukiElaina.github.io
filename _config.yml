@@ -147,6 +147,7 @@ pwa:
     deny_paths:
       # 动态内容频繁更新，避免被离线缓存命中导致浏览器展示旧页面
       - "/news"       # 排除新闻列表和每日合并内容 `<SITE_URL>/news/*`
+      - "/posts"       # 排除文章列表 `<SITE_URL>/posts/*`
       - "/rss"        # 排除原始抓取数据 `<SITE_URL>/rss/*`
 
 paginate: 10
